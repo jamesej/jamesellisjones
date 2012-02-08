@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestRun id="b51059f3-84d5-4849-b161-9612639888b2" name="James@ACER1 2011-09-17 15:39:56" runUser="Acer1\James" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2006">
+  <TestRunConfiguration name="Local Test Run" id="d0ef479a-4456-4430-897a-0d1eeb05118e">
+    <Description>This is a default test run configuration for a local test run.</Description>
+    <Deployment runDeploymentRoot="C:\Dev\MVC2MS\JamesEllisJones\TestResults\James_ACER1 2011-09-17 15_39_56">
+      <DeploymentItem filename="C:\Dev\MVC2MS\MVC2MS\bin\Debug\L24CM.dll" />
+    </Deployment>
+    <TestTypeSpecific />
+  </TestRunConfiguration>
+  <ResultSummary outcome="Failed">
+    <Counters total="2" executed="2" passed="1" error="0" failed="1" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+  <Times creation="2011-09-17T15:39:56.5866106+01:00" queuing="2011-09-17T15:40:17.4982977+01:00" start="2011-09-17T15:40:18.9149649+01:00" finish="2011-09-17T15:40:21.4252938+01:00" />
+  <TestDefinitions>
+    <UnitTest name="GetTagTest" storage="c:\dev\mvc2ms\l24cmtest\bin\debug\l24cmtest.dll" id="c5191af5-cbe2-5a2d-3b84-02a902f660d1">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="d93865ac-ed5e-4d40-a27e-d4d3fc997171" />
+      <TestMethod codeBase="C:\Dev\MVC2MS\L24CMTest\bin\Debug\L24CMTest.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="L24CMTest.HtmlXTest, L24CMTest" name="GetTagTest" />
+    </UnitTest>
+    <UnitTest name="TestMethod1" storage="c:\dev\mvc2ms\l24cmtest\bin\debug\l24cmtest.dll" id="d9b6b833-1695-e6af-d5b4-f1c9aca72e81">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="d68ae7ab-b51f-487d-af3c-4ea607963465" />
+      <TestMethod codeBase="C:\Dev\MVC2MS\L24CMTest\bin\Debug\L24CMTest.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="L24CMTest.UnitTest1, L24CMTest" name="TestMethod1" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <TestEntries>
+    <TestEntry testId="c5191af5-cbe2-5a2d-3b84-02a902f660d1" executionId="d93865ac-ed5e-4d40-a27e-d4d3fc997171" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d9b6b833-1695-e6af-d5b4-f1c9aca72e81" executionId="d68ae7ab-b51f-487d-af3c-4ea607963465" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <Results>
+    <UnitTestResult executionId="d93865ac-ed5e-4d40-a27e-d4d3fc997171" testId="c5191af5-cbe2-5a2d-3b84-02a902f660d1" testName="GetTagTest" computerName="ACER1" duration="00:00:00.7213314" startTime="2011-09-17T15:40:19.0689737+01:00" endTime="2011-09-17T15:40:21.2822856+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Fail failed. pos 216 != exp pos 0</Message>
+          <StackTrace>   at L24CMTest.HtmlXTest.GetTagBaseTest(String htmlFile, String tag, Int32 tagPos, Boolean isSingle, Int32 expPos, Int32 nAttributes, String testAttr, String testValue) in C:\Dev\MVC2MS\L24CMTest\HtmlXTest.cs:line 75
+   at L24CMTest.HtmlXTest.GetTagTest() in C:\Dev\MVC2MS\L24CMTest\HtmlXTest.cs:line 88
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="d68ae7ab-b51f-487d-af3c-4ea607963465" testId="d9b6b833-1695-e6af-d5b4-f1c9aca72e81" testName="TestMethod1" computerName="ACER1" duration="00:00:00.0005511" startTime="2011-09-17T15:40:21.2932862+01:00" endTime="2011-09-17T15:40:21.3302883+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+  </Results>
+</TestRun>

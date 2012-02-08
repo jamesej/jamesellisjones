@@ -1,0 +1,545 @@
+Option Compare Database
+Option Explicit
+
+'DEPENDS ON Form_frmOptViewDlg, Language
+'REVISIONS
+'4/9/02     Limited Option name length when adding or renaming
+'4/2/04     Does parent/child linking, dirties associated form when changed and allows for undo
+
+Private Const modOptMaxLen = 30
+
+Private WithEvents modFrmRecord As Form     'Form displaying records to which options attached
+Private WithEvents modLisOpt As ListBox     'The list
+Private WithEvents modLisOptParent As ListBox
+Private modOpvParent As OptView
+Private modOptSet As Long           'Set of categories available
+Private modStrCat As String         'Category displayed in the list
+Private modStrTblLink As String     'Many to many link table, options to form records
+Private modStrFldLink As String     'The name of the form record id field in the link table
+Private modLinkVal As Long          'The current form record id
+Private modOldLinkVal As Long       'The previous form record id
+Private modFirstAssigns As Long
+Private modIsOpen As Boolean        'Class has all necessary properties assigned
+Private modIsBound As Boolean       'Selection changes affect underlying records
+Private modSingleMode As Boolean    'Only one selection on list at once
+Private modBoundSingleMode As Boolean 'If single mode on in bound state
+Private modPreviousOpts As XCollection 'Options to revert to on undo
+Private modDirty As Boolean         'Whether option list changed on this record
+
+Public tbxDirtyable As TextBox   'Textbox to use to dirty form when options changed
+
+Public Event AfterUpdate()
+
+Public Sub Init(frm As Form, lis As ListBox, strCat As String, _
+                strTblLink As String, strFldLink As String, OptSet As Long)
+    Set Me.frmRecord = frm
+    Set Me.lisOpt = lis
+    Me.OptSet = OptSet
+    Me.strFldLink = strFldLink
+    Me.strTblLink = strTblLink
+    Me.strCat = strCat
+End Sub
+
+Public Sub RegisterParent(lis As ListBox, opv As OptView)
+    Set modLisOptParent = lis
+    Set modOpvParent = opv
+    modLisOpt.RowSource = ""
+End Sub
+
+Property Set frmRecord(frm As Form)
+    TryOpenObj modFrmRecord
+    Set modFrmRecord = frm
+    modFrmRecord.OnCurrent = "[Event Procedure]"
+    modFrmRecord.OnUndo = "[Event Procedure]"
+End Property
+
+Property Set lisOpt(lis As ListBox)
+    TryOpenObj modLisOpt
+    Set modLisOpt = lis
+    modLisOpt.AfterUpdate = "[Event Procedure]"
+    modLisOpt.BeforeUpdate = "[Event Procedure]"
+    modLisOpt.OnDblClick = "[Event Procedure]"
+End Property
+
+Property Let strCat(str As String)
+    TryOpenStr modStrCat
+    modStrCat = str
+    If str = "" Then
+        modIsOpen = False
+        modLisOpt.RowSource = ""
+        Exit Property
+    End If
+    modLisOpt.RowSource = "SELECT Opt.OptId, Opt.Opt, Opt.OptSet FROM Opt" & _
+                          " WHERE Opt.CatCode = " & uStrQ(str) & _
+                          " ORDER BY Opt.OptSet DESC, Opt.Opt"
+    modLisOpt.ColumnCount = 3
+    modLisOpt.ColumnWidths = "0cm;;0cm"
+    modFrmRecord_Current
+End Property
+
+Property Get strCat() As String
+    strCat = modStrCat
+End Property
+
+Property Let strTblLink(str As String)
+    TryOpenStr modStrTblLink
+    modStrTblLink = str
+End Property
+
+Property Let strFldLink(str As String)
+    TryOpenStr modStrFldLink
+    modStrFldLink = str
+End Property
+
+Property Let OptSet(optSetIn As Long)
+    If modOptSet = -1 Then
+        modFirstAssigns = modFirstAssigns + 1
+        If modFirstAssigns = 6 Then modIsOpen = True
+    End If
+    modOptSet = optSetIn
+End Property
+
+Property Let OptName(strName As String)
+    Dim updcmd As New ADODB.Command
+    Dim li As Long
+    
+    li = modLisOpt.ListIndex
+    If li = -1 Then Exit Property
+    
+    With updcmd
+        .ActiveConnection = CurrentProject.Connection
+        .CommandText = "UPDATE Opt SET Opt = " & uStrQ(Left(strName, modOptMaxLen)) & _
+                       " WHERE OptId = " & modLisOpt.ItemData(li)
+        .CommandType = adCmdText
+        .Execute
+    End With
+    modLisOpt.Requery
+End Property
+
+Property Let IsBound(IsBoundIn As Boolean)
+    modIsBound = IsBoundIn
+    If modIsBound Then
+        Me.Show
+        modSingleMode = modBoundSingleMode
+    Else
+        Me.ClearSelection
+        modSingleMode = False
+    End If
+End Property
+
+Property Get IsBound() As Boolean
+    IsBound = modIsBound
+End Property
+
+Property Let SingleMode(SingleModeIn As Boolean)
+    modSingleMode = SingleModeIn
+    If modIsBound Then
+        modBoundSingleMode = SingleModeIn
+    End If
+End Property
+
+Property Get SingleMode() As Boolean
+    SingleMode = modSingleMode
+End Property
+
+Public Sub DeleteOpt()
+    Dim delcmd As New ADODB.Command
+    Dim li As Long
+    
+    li = modLisOpt.ListIndex
+    If li = -1 Then Exit Sub
+    
+    If MsgBox(lanMsg("Do you really want to delete this option from every record which has it?"), _
+              vbOKCancel) = vbCancel Then
+        Exit Sub
+    End If
+    
+    With delcmd
+        .ActiveConnection = CurrentProject.Connection
+        .CommandText = "DELETE FROM Opt WHERE OptId = " & modLisOpt.ItemData(li)
+        .CommandType = adCmdText
+        .Execute
+    End With
+    modLisOpt.Requery
+End Sub
+
+Property Get OptId() As Long
+    Dim li As Long
+    
+    li = modLisOpt.ListIndex
+    
+    If li = -1 Then
+        OptId = 0
+    Else
+        OptId = modLisOpt.ItemData(li)
+    End If
+End Property
+
+Property Get OptName() As String
+    Dim li As Long
+    
+    li = modLisOpt.ListIndex
+    
+    If li = -1 Then
+        OptName = ""
+    Else
+        OptName = modLisOpt.Column(1, li)
+    End If
+End Property
+
+Property Get strOptList() As String
+    Dim Item As Long
+    Dim strOpts As String
+    
+    strOpts = ""
+    For Item = 0 To modLisOpt.ListCount - 1
+        If modLisOpt.Selected(Item) Then
+            strOpts = strOpts & "," & modLisOpt.ItemData(Item)
+        End If
+    Next Item
+    If strOpts <> "" Then
+        strOptList = Mid(strOpts, 2) 'Remove leading comma
+    Else
+        strOptList = ""
+    End If
+End Property
+
+Private Sub TryOpenObj(obj As Object)
+    If obj Is Nothing Then
+        modFirstAssigns = modFirstAssigns + 1
+        If modFirstAssigns = 6 Then modIsOpen = True
+    End If
+End Sub
+
+Private Sub TryOpenStr(str As String)
+    If str = "" Then
+        modFirstAssigns = modFirstAssigns + 1
+        If modFirstAssigns = 6 Then modIsOpen = True
+    End If
+End Sub
+
+Private Sub ParentChanged()
+    Dim strParentOpts As String
+    
+    strParentOpts = modOpvParent.strOptList
+    If strParentOpts = "" Then
+        modLisOpt.RowSource = ""
+    Else
+        modLisOpt.RowSource = "SELECT Opt.OptId, Opt.Opt FROM Opt" & _
+                              " WHERE Opt.CatCode = " & uStrQ(modStrCat) & _
+                              " AND Opt.ParentOptId IN (" & strParentOpts & ")" & _
+                              " ORDER BY Opt.Opt"
+    End If
+End Sub
+
+Public Sub ClearSelection()
+    Dim Item As Long
+    For Item = 0 To modLisOpt.ListCount - 1
+        modLisOpt.Selected(Item) = False
+    Next
+End Sub
+'Updates the table of options whose name is strTblLink
+'Makes the options linked by foreign key whose name is strFldItem to a record
+'where this key is equal to OptOf reflect the currently selected options on the
+'option list
+Public Sub UpdateLinkTable()
+    Dim cnn As ADODB.Connection
+    Dim linkrst As ADODB.Recordset
+    Dim delcmd As ADODB.Command
+    Dim Item As Long
+    Dim strParentCond As String
+    Dim strParentOpts As String
+    
+    If Not modIsOpen Then Exit Sub
+    
+    If modLinkVal = 0 Or Not modIsBound Then Exit Sub
+    
+    Set cnn = CurrentProject.Connection
+    
+    'Delete old option records
+    Set delcmd = New ADODB.Command
+    With delcmd
+        .ActiveConnection = cnn
+        
+        If modOpvParent Is Nothing Then
+            strParentCond = ""
+        Else
+            strParentOpts = modOpvParent.strOptList
+            If strParentOpts = "" Then
+                strParentCond = ""
+            Else
+                strParentCond = " AND ParentOptId IN (" & strParentOpts & ")"
+            End If
+        End If
+        
+        .CommandText = "DELETE FROM " & modStrTblLink & _
+                       " WHERE " & modStrFldLink & " = " & modLinkVal & _
+                       " AND OptId IN (SELECT OptId FROM Opt" & _
+                                " WHERE CatCode = " & uStrQ(modStrCat) & _
+                                strParentCond & ")"
+        .CommandType = adCmdText
+        .Execute
+    End With
+    
+    'Add new option records
+    Set linkrst = New ADODB.Recordset
+    With linkrst
+        .Open modStrTblLink, cnn, adOpenKeyset, adLockOptimistic, adCmdTableDirect
+        For Item = 0 To modLisOpt.ListCount - 1
+            If modLisOpt.Selected(Item) Then
+                .AddNew
+                linkrst(modStrFldLink) = modLinkVal
+                !OptId = modLisOpt.ItemData(Item)
+                .Update
+            End If
+        Next
+        .Close
+    End With
+End Sub
+
+Private Sub Class_Initialize()
+    modIsOpen = False
+    modFirstAssigns = 0
+    modStrCat = ""
+    modStrTblLink = ""
+    modStrFldLink = ""
+    modOptSet = -1
+    modIsBound = True
+    modSingleMode = False
+    modBoundSingleMode = False
+    Set modOpvParent = Nothing
+    modOldLinkVal = 0
+    Set tbxDirtyable = Nothing
+    Set modPreviousOpts = New XCollection
+    modDirty = False
+End Sub
+
+Private Sub modFrmRecord_AfterInsert()
+    'The last form current will have set modLinkVal to 0 as it would have been on
+    'a new record.  Dont have to update selections as they will all be initially
+    'blank
+    modLinkVal = Nz(modFrmRecord(modStrFldLink), 0)
+End Sub
+
+Private Sub modFrmRecord_AfterUpdate()
+    SetSelected SetList:=False
+End Sub
+
+Private Sub modFrmRecord_Current()
+    
+    If (Not modIsOpen) Or (Not modIsBound) Then Exit Sub
+    
+    modLinkVal = 0
+On Error Resume Next
+    modLinkVal = modFrmRecord(modStrFldLink)
+On Error GoTo Handle
+    If modLinkVal = modOldLinkVal Then Exit Sub
+    
+    ClearSelection
+    
+    modOldLinkVal = modLinkVal
+    
+    If Not modOpvParent Is Nothing Then
+        'Ensure the parent is showing the correct selections for the new
+        'linked form primary key
+        modOpvParent.EnsureSynced
+        'Show the options linked to the parent's options
+        ParentChanged
+    End If
+    If modLinkVal = 0 Then Exit Sub
+    
+    SetSelected
+    
+    modDirty = False
+Finish:
+    Exit Sub
+Handle:
+    Resume Finish
+End Sub
+
+Private Sub SetSelected(Optional SetPrevious As Boolean = True, Optional SetList As Boolean = True)
+    Dim linkrst As ADODB.Recordset
+    Dim Item As Long
+    
+    If SetPrevious Then
+        Debug.Print "Opt set prev "
+        modPreviousOpts.Clear
+    End If
+    
+    Set linkrst = New ADODB.Recordset
+    With linkrst
+        .Open "SELECT * FROM " & modStrTblLink & _
+              " WHERE " & modStrFldLink & " = " & modLinkVal, _
+              CurrentProject.Connection
+        Do Until .EOF
+            For Item = 0 To modLisOpt.ListCount - 1
+                If CLng(modLisOpt.ItemData(Item)) = !OptId Then
+                    If SetList Then modLisOpt.Selected(Item) = True
+                    If SetPrevious Then
+                        Debug.Print !OptId.Value
+                        modPreviousOpts.Push !OptId.Value
+                    End If
+                End If
+            Next
+            .MoveNext
+        Loop
+        .Close
+    End With
+End Sub
+
+Public Sub Undo()
+    Dim Item As Long
+    
+    'Set the selections to those stored on the last underlying form Current event
+    ClearSelection
+    
+    For Item = 0 To modLisOpt.ListCount - 1
+        If modPreviousOpts.Contains(CLng(modLisOpt.ItemData(Item))) Then
+            modLisOpt.Selected(Item) = True
+        End If
+    Next
+    
+    'Store these selections in the underlying tables
+    UpdateLinkTable
+    modDirty = False
+End Sub
+
+Public Sub Show()
+    modOldLinkVal = -2
+    modFrmRecord_Current
+End Sub
+
+Public Sub EnsureSynced()
+    modFrmRecord_Current
+End Sub
+
+Public Sub AddOpt(strName As String)
+    Dim addcmd As New ADODB.Command
+    Dim vParentOptId As Variant
+
+    With addcmd
+        .ActiveConnection = CurrentProject.Connection
+        If modOpvParent Is Nothing Then
+            .CommandText = "INSERT INTO Opt (Opt, CatCode, OptSet) VALUES (" & _
+                            uStrQ(Left(strName, modOptMaxLen)) & ", " & _
+                            uStrQ(modStrCat) & "," & modOptSet & ")"
+        Else
+            vParentOptId = uUpTo(modOpvParent.strOptList, ",")
+            .CommandText = "INSERT INTO Opt (Opt, CatCode, OptSet, ParentOptId) VALUES (" & _
+                            uStrQ(Left(strName, modOptMaxLen)) & ", " & _
+                            uStrQ(modStrCat) & "," & modOptSet & "," & _
+                            Nz(vParentOptId, "Null") & ")"
+        End If
+
+        .CommandType = adCmdText
+        .Execute
+    End With
+    modLisOpt.Requery
+End Sub
+
+Public Sub SetOpt(OptId As Long)
+On Error GoTo Handle
+    uInsert modStrTblLink, "", modStrFldLink, modLinkVal, "OptId", OptId
+    SetSelected SetPrevious:=False
+    If Not tbxDirtyable Is Nothing Then tbxDirtyable.Value = tbxDirtyable.Value
+    modDirty = True
+Finish:
+    Exit Sub
+Handle:
+    Resume Finish
+End Sub
+
+Public Sub SetOptAll(IsOn As Boolean)
+    Dim rstOpts As New ADODB.Recordset
+    Dim li As Long
+    Dim strMsg As String
+    Dim delcmd As ADODB.Command
+    
+    li = modLisOpt.ListIndex
+    If li = -1 Then Exit Sub
+    
+    If IsOn Then
+        strMsg = "set"
+    Else
+        strMsg = "clear"
+    End If
+    
+    If MsgBox(lanMsg("Do you really want to " & strMsg & " this option on every listed record?"), _
+              vbOKCancel) = vbCancel Then
+        Exit Sub
+    End If
+    
+    With delcmd
+        .ActiveConnection = CurrentProject.Connection
+        .CommandText = "DELETE FROM " & modStrTblLink & _
+                       " WHERE " & modStrFldLink & " = " & _
+                       " AND OptId = " & modLisOpt.ItemData(li)
+        .CommandType = adCmdText
+        .Execute
+    End With
+    
+    'If IsOn Then
+        'uSQLCmd "INSERT INTO "
+    modLisOpt.Requery
+End Sub
+
+Private Sub modFrmRecord_Undo(Cancel As Integer)
+On Error GoTo Handle
+    If modDirty Then Me.Undo
+Finish:
+    Exit Sub
+Handle:
+    lanErrMsg "Undo failed, try again"
+    Cancel = True
+    Resume Finish
+End Sub
+
+Private Sub modLisOpt_AfterUpdate()
+    Dim Item As Long
+    Dim li As Long
+    
+    li = modLisOpt.ListIndex
+    
+    If modLisOpt.Column(2, li) = 0 Then Exit Sub
+    
+    If li <> -1 And modSingleMode Then
+        For Item = 0 To modLisOpt.ListCount - 1
+            If modLisOpt.Selected(Item) And Item <> li Then
+                modLisOpt.Selected(Item) = False
+            End If
+        Next
+    End If
+    UpdateLinkTable
+    RaiseEvent AfterUpdate
+    
+    'Dirty the associated form
+    If Not tbxDirtyable Is Nothing Then tbxDirtyable.Value = tbxDirtyable.Value
+    modDirty = True
+End Sub
+
+Private Sub modLisOpt_BeforeUpdate(Cancel As Integer)
+    Dim li As Long
+    
+    li = modLisOpt.ListIndex
+    If (li = -1) Then Exit Sub
+    If modLisOpt.Column(2, li) = 0 And modLisOpt.Selected(li) Then
+        MsgBox "You can't select this option any more"
+        modLisOpt.Selected(li) = False
+        Cancel = True
+    End If
+End Sub
+
+Private Sub modLisOpt_DblClick(Cancel As Integer)
+    Dim frmOVD As Form
+    Dim li As Long
+    
+    DoCmd.OpenForm "frmOptViewDlg", , , , , acHidden
+    Set frmOVD = Forms!frmOptViewDlg
+    Set frmOVD.opvLinked = Me
+    frmOVD.Visible = True
+End Sub
+
+Private Sub modLisOptParent_AfterUpdate()
+    Me.Show
+End Sub
+

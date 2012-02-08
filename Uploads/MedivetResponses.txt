@@ -1,0 +1,22 @@
+
+Success = 1,						(succeeded OK)
+DBErrorDuringAuthorizationCheck = 2,			Failed to perform database operation
+CannotDeserialize = 4,					There is an error in the format of the submitted XML
+DBErrorDuringPmsVendorIDLookup = 5,			Failed to perform database operation
+PmsVendorIDDoesNotExist = 6,				The PMS Vendor is not registered for using Craftworks
+DBErrorDuringClinicAccountNumberLookup = 7,		Failed to perform database operation
+ClinicAccountNumberDoesNotExist = 8,			The clinic has not been registered for using Craftworks
+PhoneMobileOrEmailRequired = 9,				The pet owner has to have a landline, mobile number or email address on their record
+PmsAnimalIDRequired = 10,				The animal identification code is missing for the (or one of the) animal(s)
+DBErrorDuringUserLookup = 11,				Failed to perform database operation
+DBErrorDuringClinicLookup = 12,				Failed to perform database operation
+DBErrorDuringOwnerAddressSave = 13,			Failed to perform database operation
+DBErrorDuringInsertUpdateOwnerIntoPmsOwners = 14,	Failed to perform database operation
+DBErrorDuringUpdateUser = 15,				Failed to perform database operation
+DBErrorDuringAnimalLoad = 16,				Failed to perform database operation
+DBErrorDuringInsertUpdateAnimal = 17,			Failed to perform database operation
+ErrorSettingAnimalName = 18,				(should not appear)
+ErrorSettingAnimalBreed = 19,				(should not appear)
+ErrorSettingAnimalGender = 20,				(should not appear)
+ErrorSettingAnimalDateOfBirth = 21,			(should not appear)			
+ErrorSettingAnimalNeuterStatus = 22			(should not appear)

@@ -1,0 +1,6 @@
+Title, GivenName, FamilyName
+IF OptIn THEN Email
+Telphone OR Business (telephone) OR Mobile
+BestTimeToCall
+2+ Address lines
+
