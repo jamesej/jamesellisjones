@@ -6,15 +6,11 @@
 <head runat="server">
     <title>L24CMFileManager</title>
     
-    <!--<link href="/L24CM/Embedded/Content/jquery.jstreelist.css" rel="stylesheet" type="text/css" />-->
     <link href="/L24CM/Embedded/Content/jquery.jstreelist.css" rel="stylesheet" type="text/css" />
     <link href="/L24CM/Embedded/Content/jquery.layout.css" rel="stylesheet" type="text/css" />
     <link href="/L24CM/Embedded/Content/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
     <link href="/L24CM/Embedded/Content/l24cm.ui.css" rel="stylesheet" type="text/css" />
-    <!--
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js" type="text/javascript"></script>
-    <script src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.js" type="text/javascript"></script>
-    -->
+
     <script src="/L24CM/Embedded/Scripts/jquery.js" type="text/javascript"></script>
     <script src="/L24CM/Embedded/Scripts/jquery-ui.js" type="text/javascript"></script>
     <script src="/L24CM/Embedded/Scripts/jquery.tmpl.js" type="text/javascript"></script>

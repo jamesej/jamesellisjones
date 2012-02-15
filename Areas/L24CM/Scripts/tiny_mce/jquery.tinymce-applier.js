@@ -33,13 +33,4 @@ $(document).ready(function () {
 	        staffid: "991234"
 	    }
 	});
-	$('#editor').load(function() {
-		$('#editor').contents().find('._L24Html').click(function () {
-			var $this = $(this);
-			top.showHtml($this.html(), function(h) {
-				$this.html(h);
-				$this.siblings('input').val(h);
-			});
-		});
-	});
 });

@@ -6,12 +6,19 @@
 <head runat="server">
         <title>Editor</title>
     <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js" type="text/javascript"></script>-->
+    <link href="/L24CM/Embedded/Content/jquery.jstreelist.css" rel="stylesheet" type="text/css" />
     <link href="/L24CM/Embedded/Content/jquery.layout.css" rel="stylesheet" type="text/css" />
-    <link href="/Areas/L24CM/Content/l24cm.ui.css" rel="stylesheet" type="text/css" />
+    <link href="/L24CM/Embedded/Content/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
+    <link href="/L24CM/Embedded/Content/l24cm.ui.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="/L24CM/Embedded/Scripts/jquery-ui.js"></script>
+    <script src="/L24CM/Embedded/Scripts/jquery.tmpl.js" type="text/javascript"></script>
     <script type="text/javascript" src="/L24CM/Embedded/Scripts/jquery.layout.js"></script>
     <script type="text/javascript" src="/L24CM/Embedded/Scripts/jquery.simplemodal.js"></script>
     <script type="text/javascript" src="/Areas/L24CM/scripts/tiny_mce/jquery.tinymce-applier.js"></script>
+    <script src="/L24CM/Embedded/Scripts/fileuploader.js" type="text/javascript"></script>
+    <script type="text/javascript" src="/L24CM/Embedded/Scripts/jquery.jstree.js"></script>
+    <script type="text/javascript" src="/L24CM/Embedded/Scripts/jquery.jstreelist.js"></script>
+    <script type="text/javascript" src="/L24CM/Embedded/Scripts/jquery.contextMenu.js"></script>
     <script>
         $(document).ready(function() {
             var firstReload = true;
@@ -21,6 +28,9 @@
                     $('.ui-layout-center')[0].contentDocument.location.reload(true);
                 firstReload = false;
             });
+
+            $('#_L24FileMgrContainer').jstreelist({ rootPath: '/' });
+            //$('#outer').layout();
         });
         // RTE
 
@@ -63,6 +73,28 @@
             
             $('textarea#_L24RTE').html(contents);
         }
+
+        // FileMgr
+
+        function getFile(current, updateFile) {
+            var $fm = $('#_L24FileMgrContainer').css('display', 'block');
+            $fm.modal({
+                overlayClose: true,
+                onClose: function(dialog) {
+                    alert($('#filename').val());
+                    updateFile($('#filename').val());
+                    $.modal.close();
+                }
+            });
+            $fm.find('#outer').layout();
+        }
+    </script>
+    <script id="fileListTemplate" type="text/x-jquery-tmpl">
+        <table style='width:300px'>
+        <tr><th></th><th>Name</th><th>Size</th></tr>
+        {{each dirs}}<tr title='${dir}${name}/'><td class='dir jstree-default'><ins style='width:16px;height:16px;display:inline-block' class='ext ext_dir'/></td><td><span>${name}</span></td><td></td></tr>{{/each}}
+        {{each files}}<tr title='${dir}${name}'><td><ins style='width:16px;height:16px;display:inline-block' class='ext ext_${ext}'/></td><td><span>${name}</span></td><td>${size}</td></tr>{{/each}}
+        </table>
     </script>
 </head>
 <body style="height: 100%; width: 100%">
@@ -71,5 +103,15 @@
 <iframe class="ui-layout-east" id="editor" src="<%= ViewData["Path"] %>?-action=edit"></iframe>
 </div>
 <div id='_L24RTEContainer' style='display:none'><textarea id='_L24RTE'>abcdef</textarea></div>
+<div id='_L24FileMgrContainer' style='display:none'>
+    <div id='outer'>
+        <div id='treeContainer' class='treeContainer ui-layout-west'></div>
+        <div id='listContainer' class='listContainer ui-layout-center'></div>
+    </div>
+    <div id='filenameBox'>
+        <input id='filename' class='filename' type='text' />
+    </div>
+</div>
+
 </body>
 </html>
