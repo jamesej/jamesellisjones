@@ -1,7 +1,0 @@
-C:\Dev\MVC2MS\MVC2MSTest\obj\Debug\ResolveAssemblyReference.cache
-C:\Dev\MVC2MS\MVC2MSTest\bin\L24CMTest.dll
-C:\Dev\MVC2MS\MVC2MSTest\bin\L24CMTest.pdb
-C:\Dev\MVC2MS\MVC2MSTest\bin\L24CM.dll
-C:\Dev\MVC2MS\MVC2MSTest\bin\L24CM.pdb
-C:\Dev\MVC2MS\MVC2MSTest\obj\Debug\L24CMTest.dll
-C:\Dev\MVC2MS\MVC2MSTest\obj\Debug\L24CMTest.pdb

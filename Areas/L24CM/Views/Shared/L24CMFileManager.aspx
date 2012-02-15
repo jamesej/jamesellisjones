@@ -7,10 +7,10 @@
     <title>L24CMFileManager</title>
     
     <!--<link href="/L24CM/Embedded/Content/jquery.jstreelist.css" rel="stylesheet" type="text/css" />-->
-    <link href="/Content/jquery.jstreelist.css" rel="stylesheet" type="text/css" />
+    <link href="/L24CM/Embedded/Content/jquery.jstreelist.css" rel="stylesheet" type="text/css" />
     <link href="/L24CM/Embedded/Content/jquery.layout.css" rel="stylesheet" type="text/css" />
     <link href="/L24CM/Embedded/Content/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
-    <link href="/Content/l24cm.ui.css" rel="stylesheet" type="text/css" />
+    <link href="/L24CM/Embedded/Content/l24cm.ui.css" rel="stylesheet" type="text/css" />
     <!--
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js" type="text/javascript"></script>
     <script src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.js" type="text/javascript"></script>
@@ -48,12 +48,14 @@
     </script>
 </head>
 <body>
-    <div id='outer'>
-        <div id='treeContainer' class='treeContainer ui-layout-west'></div>
-        <div id='listContainer' class='listContainer ui-layout-center'></div>
-    </div>
-    <div id='filenameBox'>
-        <input id='filename' class='filename' type='text' />
+    <div id='filemgr'>
+        <div id='outer'>
+            <div id='treeContainer' class='treeContainer ui-layout-west'></div>
+            <div id='listContainer' class='listContainer ui-layout-center'></div>
+        </div>
+        <div id='filenameBox'>
+            <input id='filename' class='filename' type='text' />
+        </div>
     </div>
 </body>
 </html>

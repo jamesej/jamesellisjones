@@ -1,12 +1,12 @@
 ﻿<%@ Control Language="C#" Inherits="System.Web.Mvc.ViewUserControl<L24CM.Models.Link>" %>
-<% if (ViewData.Model.IsInternal)
+<% if (Model.IsInternal)
    {  %>
-   <%= Html.ActionLink(ViewData.Model.Content, ViewData.Model.Action, ViewData.Model.Controller) %>
+   <%= Html.ActionLink(Model.Content, Model.Action, Model.Controller) %>
 <% }
    else
    { %>
-<a href="<%= ViewData.Model.Url == null ? "#" : ViewData.Model.Url %>">
-    <%= ViewData.Model.Content %>
+<a href="<%= Model.Url == null ? "#" : Model.Url %>">
+    <%= Model.Content %>
 </a>
 <% } %>
 
