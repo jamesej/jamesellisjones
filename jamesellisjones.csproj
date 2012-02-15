@@ -376,6 +376,7 @@
   <ItemGroup>
     <Content Include="Areas\L24CM\Config\basic.config" />
     <Content Include="Areas\L24CM\Views\Shared\DisplayTemplates\Html.ascx" />
+    <Content Include="Areas\L24CM\Views\Shared\DisplayTemplates\Image.ascx" />
     <Content Include="Areas\L24CM\Views\Shared\DisplayTemplates\Link.ascx" />
     <Content Include="Areas\L24CM\Views\Shared\EditorTemplates\Image.ascx" />
     <Content Include="Views\Demo\Index.aspx" />

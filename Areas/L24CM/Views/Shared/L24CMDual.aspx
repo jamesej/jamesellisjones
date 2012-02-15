@@ -81,9 +81,11 @@
             $fm.modal({
                 overlayClose: true,
                 onClose: function(dialog) {
-                    alert($('#filename').val());
-                    updateFile($('#filename').val());
-                    $.modal.close();
+                    var msg = updateFile($('#filename').val());
+                    if (msg)
+                        alert(msg);
+                    else
+                        $.modal.close();
                 }
             });
             $fm.find('#outer').layout();
@@ -110,6 +112,7 @@
     </div>
     <div id='filenameBox'>
         <input id='filename' class='filename' type='text' />
+        <div id='fileDetails' class='fileDetails'></div>
     </div>
 </div>
 

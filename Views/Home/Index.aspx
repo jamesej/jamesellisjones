@@ -11,9 +11,11 @@
     <div id='leftDiv'>
     <p>Here's the copyx:</p>
     <p><%= Html.DisplayFor(m => m.BlogLink) %></p>
+    <%= Html.DisplayFor(m => m.Story) %>
     </div>
     <div id='rightDiv'>
     <p>Test</p>
+    <%= Html.DisplayFor(m => m.Image1) %>
     </div>
 
 </asp:Content>
