@@ -83,7 +83,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Areas\L24CM\Content\l24cm.ui.css" />
     <Content Include="Content\Images\kbd.jpg" />
     <Content Include="dummy.htm" />
     <Content Include="Global.asax" />
@@ -382,6 +381,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Areas\L24CM\Content\" />
     <Folder Include="Areas\L24CM\Controllers\" />
     <Folder Include="Areas\L24CM\Models\" />
     <Folder Include="Uploads\NewFolder1\" />

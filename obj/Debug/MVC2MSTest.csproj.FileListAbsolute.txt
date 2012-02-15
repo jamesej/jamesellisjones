@@ -1,7 +1,0 @@
-C:\Dev\MVC2MS\MVC2MSTest\bin\MVC2MS.dll
-C:\Dev\MVC2MS\MVC2MSTest\bin\MVC2MS.pdb
-C:\Dev\MVC2MS\MVC2MSTest\obj\Debug\ResolveAssemblyReference.cache
-C:\Dev\MVC2MS\MVC2MSTest\bin\Mvc2MsTest.dll
-C:\Dev\MVC2MS\MVC2MSTest\bin\Mvc2MsTest.pdb
-C:\Dev\MVC2MS\MVC2MSTest\obj\Debug\Mvc2MsTest.dll
-C:\Dev\MVC2MS\MVC2MSTest\obj\Debug\Mvc2MsTest.pdb
