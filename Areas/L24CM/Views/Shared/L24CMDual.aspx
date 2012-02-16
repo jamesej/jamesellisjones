@@ -29,7 +29,7 @@
                 firstReload = false;
             });
 
-            $('#_L24FileMgrContainer').jstreelist({ rootPath: '/' });
+            $('#_L24FileMgrContainer').jstreelist({ rootPath: '<%= ViewData["FileManagerRoot"] %>' });
             //$('#outer').layout();
         });
         // RTE
@@ -84,8 +84,10 @@
                     var msg = updateFile($('#filename').val());
                     if (msg)
                         alert(msg);
-                    else
+                    else {
                         $.modal.close();
+                        $('#_L24FileMgrContainer').css('display', 'none');
+                    }
                 }
             });
             $fm.find('#outer').layout();
@@ -105,7 +107,7 @@
 <iframe class="ui-layout-east" id="editor" src="<%= ViewData["Path"] %>?-action=edit"></iframe>
 </div>
 <div id='_L24RTEContainer' style='display:none'><textarea id='_L24RTE'>abcdef</textarea></div>
-<div id='_L24FileMgrContainer' style='display:none'>
+<div id='_L24FileMgrContainer'>
     <div id='outer'>
         <div id='treeContainer' class='treeContainer ui-layout-west'></div>
         <div id='listContainer' class='listContainer ui-layout-center'></div>
